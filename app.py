@@ -7,9 +7,9 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 
 # -----------------------------
-# API KEY (PASTE YOUR GROQ KEY)
+# API KEY (STREAMLIT SECRETS - SAFE METHOD)
 # -----------------------------
-GROQ_API_KEY = "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"
+GROQ_API_KEY = st.secrets[ "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"]
 
 # -----------------------------
 # STREAMLIT UI
@@ -55,7 +55,7 @@ def create_vector_db(chunks):
     db.save_local("faiss_index")
 
 # -----------------------------
-# LOAD AI MODEL (REAL AI)
+# LOAD AI MODEL
 # -----------------------------
 def get_llm():
     return ChatGroq(
@@ -69,6 +69,10 @@ def get_llm():
 # -----------------------------
 def ask_question(question):
 
+    if not os.path.exists("faiss_index"):
+        st.warning("⚠️ Please click 'Process Story Files' first.")
+        return
+
     db = FAISS.load_local(
         "faiss_index",
         get_embeddings(),
@@ -76,12 +80,11 @@ def ask_question(question):
     )
 
     docs = db.similarity_search(question)
-
     context = "\n".join([d.page_content for d in docs])
 
     llm = get_llm()
 
-    # STEP 1: CHECK IF RELATED TO STORY
+    # Check relevance
     check_prompt = f"""
 Answer ONLY YES or NO.
 
@@ -95,14 +98,14 @@ Is this question related to Baahubali story?
     check = llm.invoke(check_prompt).content.lower()
 
     if "no" in check:
-        st.warning("❌ This is not related to Baahubali story.\n👉 Ask only story-related questions.")
+        st.warning("❌ Ask only Baahubali story-related questions.")
         return
 
-    # STEP 2: FINAL ANSWER
+    # Final answer
     prompt = f"""
 You are a helpful AI assistant.
 
-Use the context to answer the question.
+Use ONLY the context below.
 
 Context:
 {context}
