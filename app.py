@@ -9,7 +9,7 @@ from langchain_groq import ChatGroq
 # -----------------------------
 # API KEY (STREAMLIT SECRETS - SAFE METHOD)
 # -----------------------------
-GROQ_API_KEY = st.secrets[ "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"]
+GROQ_API_KEY = "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"
 
 # -----------------------------
 # STREAMLIT UI
