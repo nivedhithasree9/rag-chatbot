@@ -1,7 +1,9 @@
 streamlit
-PyPDF2
 langchain
 langchain-community
-langchain-google-genai
+langchain-core
+langchain-groq
 faiss-cpu
-google-generativeai
+sentence-transformers
+pypdf
+python-dotenv
